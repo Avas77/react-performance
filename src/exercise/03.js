@@ -16,7 +16,7 @@ function Menu({
   return (
     <ul {...getMenuProps()}>
       {items.map((item, index) => (
-        <ListItem
+        <ListItemMemo
           key={item.id}
           getItemProps={getItemProps}
           item={item}
@@ -25,11 +25,13 @@ function Menu({
           highlightedIndex={highlightedIndex}
         >
           {item.name}
-        </ListItem>
+        </ListItemMemo>
       ))}
     </ul>
   )
 }
+
+const MenuMemo = React.memo(Menu)
 // 🐨 Memoize the Menu here using React.memo
 
 function ListItem({
@@ -56,6 +58,19 @@ function ListItem({
     />
   )
 }
+
+const ListItemMemo = React.memo(ListItem, (prevProps, nextProps) => {
+  if (prevProps.getItemProps !== nextProps.getItemProps) return false
+  if (prevProps.index !== nextProps.index) return false
+  if (prevProps.selectedItem !== nextProps.selectedItem) return false
+  if (prevProps.item !== nextProps.item) return false
+  if (prevProps.highlightedIndex !== nextProps.highlightedIndex) {
+    const wasHighlighted = prevProps.highlightedIndex === prevProps.index
+    const isHighlighted = nextProps.highlightedIndex === nextProps.index
+    return wasHighlighted === isHighlighted
+  }
+  return true
+})
 // 🐨 Memoize the ListItem here using React.memo
 
 function App() {
@@ -101,7 +116,7 @@ function App() {
             &#10005;
           </button>
         </div>
-        <Menu
+        <MenuMemo
           items={items}
           getMenuProps={getMenuProps}
           getItemProps={getItemProps}
